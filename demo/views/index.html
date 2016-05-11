@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>功能清单</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta content="telephone=no,email=no" name="format-detection" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <script src="/inc/html5shiv.min.js"></script>
+    <style>
+    * {
+        box-sizing: border-box;
+    }
+
+    ul,
+    li {
+        list-style: none;
+    }
+
+    .line_ul>li{
+    	clear:both;
+    }
+
+    .line_ul ul li {
+    	width:50%;
+    	height:2em;
+    	line-height:2em;
+        float: left;
+        text-align: center;
+        border: solid 1px #666;
+        border-collapse: collapse;
+    }
+
+    .line_ul ul.title li {
+        font-weight: bold;
+    }
+
+    section {
+        width: 1200px;
+        margin: 0 auto;
+    }
+    </style>
+</head>
+
+<body>
+    <section role="main">
+        <ul class="line_ul">
+            <li>
+                <ul class="title">
+                    <li>功能</li>
+                    <li>路由</li>
+                </ul>
+            </li>
+            <li>
+                <ul>
+                    <li>公众号信息获取</li>
+                    <li><a href="/get_mp_account" target="_blank">/get_mp_account</a></li>
+                </ul>
+            </li>
+            <li>
+                <ul>
+                    <li>验证服务器配置（公众平台修改服务器配置时验证用）</li>
+                    <li>/get_mp_event</li>
+                </ul>
+            </li>
+            <li>
+                <ul>
+                    <li>验证/更新access_token和jsapi_ticket</li>
+                    <li><a href="/valid_accessToken_jsapiTicket" target="_blank">/valid_accessToken_jsapiTicket</a></li>
+                </ul>
+            </li>
+            <li>
+                <ul>
+                    <li>拉取OpenID</li>
+                    <li><a href="/getOpenID" target="_blank">/getOpenID</a></li>
+                </ul>
+            </li>
+            <li>
+                <ul>
+                    <li>根据OpenID获取用户信息</li>
+                    <li><a href="/getUserInfo?openid=oBF_PtyaxEw9Uj44wLcvPKQBFEak" target="_blank">/getUserInfo?openid=</a></li>
+                </ul>
+            </li>
+            <li>
+                <ul>
+                    <li>发布菜单</li>
+                    <li><a href="/publish_menu" target="_blank">/publish_menu</a></li>
+                </ul>
+            </li>
+            <li>
+                <ul>
+                    <li>发送模板消息</li>
+                    <li><a href="/template_message?openid=oBF_PtyaxEw9Uj44wLcvPKQBFEak" target="_blank">/template_message?openid=</a></li>
+                </ul>
+            </li>
+            <li>
+                <ul>
+                    <li>发送现金红包</li>
+                    <li><a href="/send_cash_red?openid=oBF_PtyaxEw9Uj44wLcvPKQBFEak" target="_blank">/send_cash_red?openid=</a></li>
+                </ul>
+            </li>
+            <li>
+                <ul>
+                    <li>查询现金红包状态</li>
+                    <li><a href="/getStatus_cash_red?id=1231380902201605114820030387" target="_blank">/getStatus_cash_red?id=</a></li>
+                </ul>
+            </li>
+            <li>
+                <ul>
+                    <li>企业付款</li>
+                    <li><a href="/pay_transfers?openid=oBF_PtyaxEw9Uj44wLcvPKQBFEak" target="_blank">/pay_transfers?openid=</a></li>
+                </ul>
+            </li>
+        </ul>
+    </section>
+</body>
+
+</html>

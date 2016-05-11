@@ -1,0 +1,53 @@
+/*
+    高京
+    20160217
+    全局 针对IE7、8的hack重写
+*/
+
+@important: !important;
+// 首页轮播圆点 用图片代替背景色
+body.index section.banner ul.point_ul li {
+    border: none@important;
+    background: url("/images/sprite.png") no-repeat@important;
+    background-position: -760px 0@important;
+    border-radius: 0@important;
+    &.selected {
+        border: none@important;
+        background: url("/images/sprite.png") no-repeat@important;
+        background-position: -760px -26px@important;
+    }
+}
+
+// footer 纵列标题 子标题的ul设置居左 覆盖 上一级ul的居中
+section.footer ul.column li.column_li ul {
+    text-align: left@important;
+}
+
+// 联系我们 表单的section 中的input ie7调小
+body.ContactUs_List section.form ul.form li.form_li input {
+    *width: 410px@important;
+}
+
+// 联系我们 表单的section 中的input ie7调小
+body.ContactUs_List section.form ul.form li.form_li textarea {
+    *width: 974px@important;
+}
+
+// 联系我们 表单的提交按钮的margin-top ie7调大
+body.ContactUs_List section.form input.submit_btn {
+    *margin-top: 154px@important;
+}
+
+// 联系我们 表单的称谓
+body.ContactUs_List section.form ul.form li.select ul {
+    *width: 432px@important;
+    *left: 109px@important;
+}
+
+body.ContactUs_List section.form ul.form li.select ul li {
+    *line-height: 45px@important;
+    &.option {
+        *height: 40px@important;
+        *line-height: 42px@important;
+    }
+}
