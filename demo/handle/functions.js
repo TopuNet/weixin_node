@@ -5,7 +5,12 @@
                                 3.将调用方法写在顶部注释中；4.有新方法添加时，在群里吼一声
  */
 
+<<<<<<< HEAD
 exports.domain = "twedding.cn"; // 主域名-获得二级域名用
+=======
+exports.domain = "65276588.cn"; // 主域名-获得二级域名用
+exports.domain_second = "www"; // 默认二级域名
+>>>>>>> f03a7428581973b9d267b92a284cbf32b183b197
 
 /*
    高京
@@ -18,7 +23,11 @@ exports.domain = "twedding.cn"; // 主域名-获得二级域名用
         * dt: 日期。
         CreateTimeStamp(dt)
 
+<<<<<<< HEAD
         *【同步】对JSON进行字典序排序（如需和.NET的字典序排序作匹配则不建议使用）。返回JSON对象
+=======
+        *【同步】对JSON进行字典序排序（如需和.NET的字典序排序作匹配则不建议使用，建议使用TopuAPI.65276588.cn:3333/ListSort.ashx接口作排序）。返回JSON对象
+>>>>>>> f03a7428581973b9d267b92a284cbf32b183b197
         * json_o: JSON对象。
         JsonSort(json_o) 
 
@@ -423,7 +432,11 @@ exports.CreateTimeStamp = function(dt) {
 /*
  *@高京
  *@20150825 
+<<<<<<< HEAD
  *@【同步】对JSON进行字典序排序（如需和.NET的字典序排序作匹配则不建议使用）。返回JSON对象
+=======
+ *@【同步】对JSON进行字典序排序。返回JSON对象
+>>>>>>> f03a7428581973b9d267b92a284cbf32b183b197
  *@ json_o: JSON对象。
  */
 exports.JsonSort = function(json_o) {
@@ -725,7 +738,11 @@ exports.Request = function(opt, Callback_success, Callback_error) {
     // console.log("\nfunc 705:")
     // console.dir(options.opt.body);
 
+<<<<<<< HEAD
     var _req = request(options.opt, options.Callback_success);
+=======
+    request(options.opt, options.Callback_success);
+>>>>>>> f03a7428581973b9d267b92a284cbf32b183b197
 
     // 上传文件
     if (opt.method == "post_file") {
@@ -1296,7 +1313,11 @@ exports.get_domain = function(req) {
     var hostname = req.hostname.toLowerCase();
     var end = hostname.indexOf("." + func.domain);
     if (end == -1) // 无二级域名
+<<<<<<< HEAD
         domain = "wx";
+=======
+        domain = func.domain_second;
+>>>>>>> f03a7428581973b9d267b92a284cbf32b183b197
     else
         domain = hostname.substring(0, end);
     return domain;
