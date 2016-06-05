@@ -1,4 +1,4 @@
-# weixin_node Node.Js v1.0.1
+# weixin_node Node.Js v1.0.2
 ###Node.Js端微信插件
 
 文件结构：
@@ -37,5 +37,7 @@
 更新历史：
 --------------
 
+v1.0.2：
+		修改access_token的文本存放目录改为全局变量
 v1.0.1：
-完成基本功能
+		完成基本功能
