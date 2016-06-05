@@ -1,0 +1,10 @@
+# Helicon ISAPI_Rewrite configuration file
+# Version 3.1.0.73
+
+
+RewriteEngine On
+RewriteCompatibility2 On
+RepeatLimit 200
+RewriteBase 
+RewriteCond %{HTTP:Host} ^nodewx\.65276588\.cn$
+RewriteProxy (.*) http\://nodewx.65276588.cn:4446$1 [NC,U]
