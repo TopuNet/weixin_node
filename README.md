@@ -21,6 +21,8 @@
 		exports.appToken = ["", "ivfxqc1420421734"]; // Token
 		exports.appEncodingAESKey = ["", ""]; // EncodingAESKey
 
+		exports.wx_access_token_dir_path = "./wx_Auth/"; // access_token值存放文本文件的目录，以/结束。
+
 		exports.mch_id = ["", ""]; // 支付商户号
 		exports.sub_mch_id = ["", ""]; // 支付子商户号
 		exports.pay_api_key = ["", ""]; // API证书密钥，支付平台中设置
