@@ -1,30 +1,26 @@
-/*
-    高京
-    20160415
-    微信插件 v1.0.1
-*/
+// 1.0.3
 
-// 可配置
-exports.Platform_name = ["", "高京测试号"]; // 平台名字
-exports.domain = ["", "www"]; // 二级域名
-exports.appID = ["", "wx7ecd1e0f2c477274"]; // appid
-exports.appSecret = ["", "995785f1c2281400c9908e72b82535cc"]; // appsecret
-exports.appToken = ["", "ivfxqc1420421734"]; // Token
-exports.appEncodingAESKey = ["", ""]; // EncodingAESKey
-
-exports.mch_id = ["", ""]; // 支付商户号
-exports.sub_mch_id = ["", ""]; // 支付子商户号
-exports.pay_api_key = ["", ""]; // API证书密钥，支付平台中设置
-exports.pay_cert_path = ["", ""]; // 证书物理路径 (证书需要商户在pay.weixin.qq.com登录后下载，尽量不放在网站目录下）[e.x.1]"e:\abc.pfx" [e.x.2]Server.MapPath("/abc.pfx")
-exports.pay_cert_passwd = ["", ""]; // 证书密码
-exports.pay_log_dir = "./wx_pay_log/"; // 存放日志的目录，以/结束。
-// 可配置结束 
-
-// ----以下代码不需修改----
 var func = require("./functions.js");
 var base = require("./weixin.js");
 var fs = require("fs"); // 文件操作，valid_accessToken_jsapiTicket使用
 var crypto = require('crypto'); // 加解密需要
+
+exports.Platform_name = ["", "高京测试号", "拓扑高科"]; // 平台名字
+exports.domain = ["", "wx", "nodewx"]; // 二级域名
+exports.appID = ["", "wx7ecd1e0f2c477274", "wxc326ec77786d9134"]; // appid
+exports.appSecret = ["", "995785f1c2281400c9908e72b82535cc", "ca900cf6f49c4097dcbfa5d0bbc9aa68"]; // appsecret
+exports.appToken = ["", "ivfxqc1420421734", "dw5CiwQ0DrQGxJebmZ4osBIuEWLRAOKB"]; // Token
+exports.appEncodingAESKey = ["", "", "fhD9Hkdw5CiwQ0DrQGxJebmZ4osBIuEWLRAOKBI7Oof"]; // EncodingAESKey
+
+exports.wx_access_token_dir_path = "./wx_Auth/"; // access_token值存放文本文件的目录，以/结束。
+
+exports.mch_id = ["", "", "1231380902"]; // 支付商户号
+exports.sub_mch_id = ["", "", ""]; // 支付子商户号
+exports.pay_api_key = ["", "", "5L1i2M7i4G5P8L8k9G5d2L5P3C5g9d8p"]; // API证书密钥，支付平台中设置
+exports.pay_cert_path = ["", "", "e:/apiclient_cert_topu_1231380902.p12"]; // 证书物理路径 (证书需要商户在pay.weixin.qq.com登录后下载，尽量不放在网站目录下）[e.x.1]"e:\abc.pfx" [e.x.2]Server.MapPath("/abc.pfx")
+exports.pay_cert_passwd = ["", "", "1231380902"]; // 证书密码
+exports.pay_log_dir = "./wx_pay_log/"; // 存放日志的目录，以/结束。
+
 
 exports.access_token = ["", "", ""]; // access_token
 exports.access_token_time = ["", new Date().setFullYear(1900, 0, 1), new Date().setFullYear(1900, 0, 1)]; // access token过期时间
@@ -97,7 +93,7 @@ exports.get_accessToken_jsapiTicket = function(req, need_jsapi_ticket, Callback_
     var domain = base.domain.indexOf(domain_str);
 
     // 获得文件路径
-    var dirPath = "./wx_Auth/"
+    var dirPath = base.wx_access_token_dir_path;
     var filePath = dirPath + base.domain[domain] + ".txt";
 
     var getting = function() {
@@ -439,6 +435,20 @@ exports.upload_file_temp = function(req, opt) {
         }
 
         func.Request(option, opt.Callback_success, Callback_error);
+
+
+        // var _req = request.post(url, function(err, res, result) {
+        //     if (err) {
+        //         console.log("\nhandle weixin 291:")
+        //         console.dir(err);
+        //     } else if (opt.Callback_success) {
+        //         var json = JSON.parse(result);
+        //         opt.Callback_success(json.media_id);
+        //     }
+        // });
+        // var form = _req.form();
+        // form.append("media", fs.createReadStream(opt.filename));
+        // form.append("end", "");
     });
 };
 
@@ -497,12 +507,7 @@ exports.getOpenID = function(req, Callback_success, OpenID_start) {
         var opt = {
             url: "https://api.weixin.qq.com/cgi-bin/user/get?access_token=" + access_token + "&next_openid=" + OpenID_start
         };
-
-        var Callback_error = function(err) {
-            console.log("\nhandle weixin 501:")
-            console.dir(err);
-        };
-        func.Request(opt, Callback_success, Callback_error);
+        func.Request(opt, Callback_success);
     }
 
     base.get_accessToken_jsapiTicket(req, false, access_token_Callback_success);
@@ -540,12 +545,7 @@ exports.getUserInfo = function(req, OpenID, Callback_success) {
             url: "https://api.weixin.qq.com/cgi-bin/user/info?access_token=" + access_token + "&openid=" + OpenID + "&lang=zh_CN"
         };
 
-        var Callback_error = function(err) {
-            console.log("\nhandle weixin 542:")
-            console.dir(err);
-        };
-
-        func.Request(opt, Callback_success, Callback_error);
+        func.Request(opt, Callback_success);
     }
 
     base.get_accessToken_jsapiTicket(req, false, access_token_Callback_success);
@@ -572,7 +572,7 @@ exports.publish_menu = function(req, menu_str, Callback_success) {
         };
 
         var Callback_error = function(err) {
-            console.log("\nhandle weixin 573:");
+            console.log("\nhandle weixin 569:");
             console.dir(err);
         };
 
@@ -663,12 +663,7 @@ exports.get_accessToken_byCode = function(req, code, Callback_success) {
         url: "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + base.appID[domain_index] + "&secret=" + base.appSecret[domain_index] + "&code=" + code + "&grant_type=authorization_code"
     };
 
-    var Callback_error = function(err) {
-        console.log("\nhandle weixin 665:")
-        console.dir(err);
-    };
-
-    func.Request(opt, Callback_success, Callback_error);
+    func.Request(opt, Callback_success);
 };
 
 // 【异步】 发送模板消息
@@ -722,11 +717,105 @@ exports.send_template_message = function(req, opt, Callback_success) {
     base.get_accessToken_jsapiTicket(req, false, access_token_Callback_success);
 };
 
+// 【异步】 生成二维码图片。
+/*
+    * 高京
+    * 2016-06-10
+    * opt = {
+        expire_seconds: 该二维码有效时间，以秒为单位。 最大不超过2592000（即30天），此字段如果不填，则默认有效期为30秒。,
+        action_name: 二维码类型，QR_SCENE为临时,QR_LIMIT_SCENE为永久（sence_id参数传值）,QR_LIMIT_STR_SCENE为永久（scene_str参数传值）,
+        scene_v: 场景值，QR_SCENE为32位非0整型，QR_LIMIT_SCENE最大值为100000（目前参数只支持1--100000），QR_LIMIT_STR_SCENE为字符串，长度限制为1到64,
+    }
+    * callback(json): 成功回调
+*/
+exports.create_qrcode = function(req, opt, Callback_success) {
+    var access_token_Callback_success = function(access_token) {
+
+        var url = "";
+        if (opt.action_name == "QR_SCENE")
+            url = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + access_token;
+        else
+            url = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + access_token;
+
+        var action_info = {
+            "scene": {}
+        };
+        if (opt.action_name == "QR_LIMIT_STR_SCENE") {
+            action_info = {
+                "scene": {
+                    "scene_str": opt.scene_v
+                }
+            }
+        } else {
+            action_info = {
+                "scene": {
+                    "scene_id": opt.scene_v
+                }
+            }
+        }
+
+        var _opt = {
+            "url": url,
+            "method": "post_json",
+            "PostData": {
+                "expire_seconds": opt.expire_seconds,
+                "action_name": opt.action_name,
+                "action_info": action_info,
+            },
+            "PostData_escape": "false"
+        };
+
+        var Callback_error = function(err) {
+            console.log("\nhandle weixin 775:")
+            console.dir(err);
+        };
+
+        func.Request(_opt, Callback_success, Callback_error);
+
+    };
+
+
+    base.get_accessToken_jsapiTicket(req, false, access_token_Callback_success);
+};
+
+// 【异步】 用二维码ticket换取二维码图片并保存为服务器图片。
+/*
+    * 高京
+    * 2016-06-10
+    * opt = {
+        ticket: ticket值,
+        filepath: 文件完整路径，需确保文件目录存在
+    }
+    * callback(): 成功回调
+*/
+exports.get_qrcode_by_ticket = function(opt, Callback_success) {
+
+    var _opt = {
+        "url": "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + opt.ticket
+    };
+
+    var _Callback_success = function(json) {
+
+
+        var request = require("request");
+
+        request("https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + json.ticket, Callback_success).pipe(fs.createWriteStream(opt.filepath));
+    }
+
+    var Callback_error = function(err) {
+        console.log("\nhandle weixin 801:")
+        console.dir(err);
+    };
+
+    func.Request(_opt, Callback_success, Callback_error);
+
+};
+
 // 【异步】 发送红包
 /*
     * 高京
     * 2016-05-06
-    * opt: {
+    * opt = {
         mch_id: 微信商户号。默认根据二级域名获得,
         send_name: 红包发送者名称,
         re_openid: 接受红包的用户OpenID,
@@ -738,7 +827,7 @@ exports.send_template_message = function(req, opt, Callback_success) {
     }
     * Callback_success(json): 成功回调
 */
-exports.send_cash_red = function(req, opt, Callback_success) {
+exports.send_cash_red = function(req, opt, Callback_success, Callback_error) {
     var opt_source = opt; // 保留原始opt
 
     var source_uri = req.originalUrl; // 地址栏
@@ -747,12 +836,11 @@ exports.send_cash_red = function(req, opt, Callback_success) {
     opt.mch_id = opt.mch_id || base.mch_id[domain_index];
 
     domain_index = base.mch_id.indexOf(opt.mch_id);
-    opt["wxappid"] = base.appID[domain_index];
+    opt.wxappid = base.appID[domain_index];
 
     // 客户端IP
     opt["client_ip"] = req.ip.replace("::ffff:", "");
-    if (opt["client_ip"] == "::1")
-        opt["client_ip"] = "127.0.0.1";
+    // opt["client_ip"] = "192.168.1.1";
 
     // 随机数
     opt["nonce_str"] = func.CreateRandomStr(32, 7);
@@ -767,8 +855,8 @@ exports.send_cash_red = function(req, opt, Callback_success) {
     opt["sign"] = signature;
     var xml = func.jsonToXml(opt);
 
-    // console.log("\nhandle weixin:785:")
-    // console.log(xml);
+    console.log("\nhandle weixin:785:")
+    console.log(xml);
 
     // 发送请求
     var _opt = {
@@ -788,7 +876,7 @@ exports.send_cash_red = function(req, opt, Callback_success) {
             // 如果是订单号问题，则1分钟后重新发放（微信频率限制）
             if (json.xml.err_code == "FATAL_ERROR")
                 setTimeout(function() {
-                    base.send_cash_red(req, opt_source, Callback_success);
+                    base.send_cash_red(req, opt_source, Callback_success, Callback_error);
                 }, 61000);
             else {
                 // console.log("\nhandle weixin 823:")
@@ -796,11 +884,10 @@ exports.send_cash_red = function(req, opt, Callback_success) {
 
                 // 写入日志
                 var _log_str = json.xml.result_code == "SUCCESS" ? "成功" : "失败" + "\t(" + json.xml.return_msg + ")";
-                _log_str += "\r\n订单号：" + opt.mch_billno;
-                _log_str += "\r\n金额：" + opt.total_amount / 100.00 + "元";
-                _log_str += "\r\nOpenID：" + opt.re_openid;
-                _log_str += "\r\n公众号：" + func.arr_value_match(base.appID, opt.wxappid, base.Platform_name) + "\t(" + opt.wxappid + ")";
-                _log_str += "\r\n调用地址：" + source_uri;
+                _log_str += "\r\n订单号：" + json.xml.mch_billno;
+                _log_str += "\r\n金额：" + json.xml.total_amount / 100.00 + "元";
+                _log_str += "\r\nOpenID：" + json.xml.re_openid;
+                _log_str += "\r\n公众号：" + func.arr_value_match(base.appID, json.xml.wxappid, base.Platform_name) + "\t(" + json.xml.wxappid + ")";
                 _log_str += "\r\n日志时间：" + new Date().toLocaleString();
 
                 var _log_opt = {
@@ -818,11 +905,6 @@ exports.send_cash_red = function(req, opt, Callback_success) {
         });
     };
 
-    var Callback_error = function(err) {
-        console.log("\nhandle weixin 818:")
-        console.dir(err);
-    };
-
     func.Request(_opt, _Callback_success, Callback_error);
 };
 
@@ -834,9 +916,9 @@ exports.send_cash_red = function(req, opt, Callback_success) {
         mch_id: 微信商户号。默认根据二级域名获得,
         mch_billno: 待查红包的商家订单号
     }
-    * Callback_success(json): 成功回调
+    * Callback_success(xml): 成功回调
 */
-exports.getStatus_cash_red = function(req, opt, Callback_success) {
+exports.search_cash_red = function(req, opt, Callback_success, Callback_error) {
 
     // 获得二级域名序号
     var domain_index = base.get_domain_index(req);
@@ -853,146 +935,7 @@ exports.getStatus_cash_red = function(req, opt, Callback_success) {
     // 订单类型-固定值
     opt["bill_type"] = "MCHT";
 
-    // 生成签名
-    opt["sign"] = base.make_signature(opt, base.pay_api_key[domain_index]);
 
-    // 组织xml
-    var xml = func.jsonToXml(opt);
-
-    // 发送请求
-    var _opt = {
-        url: "https://api.mch.weixin.qq.com/mmpaymkttransfers/gethbinfo ",
-        method: "post_str",
-        PostData: xml,
-        PostData_escape: "false",
-        pfx: base.pay_cert_path[domain_index],
-        passwd: base.pay_cert_passwd[domain_index]
-    };
-    var _Callback_success = function(xml) {
-
-        func.xmlToJson(xml, function(json) {
-
-            // 成功回调
-            if (Callback_success)
-                Callback_success(json.xml);
-        });
-    };
-
-    var Callback_error = function(err) {
-        console.log("\nhandle weixin 884:")
-        console.dir(err);
-    };
-
-    func.Request(_opt, _Callback_success, Callback_error);
-};
-
-// 【异步】 企业付款
-/*
-    * 高京
-    * 2016-05-11
-    * opt: {
-        mchid: 微信商户号。默认根据二级域名获得,
-        openid: 收款用户OpenID,
-        check_name: 校验用户姓名选项，默认NO_CHECK,
-        re_user_name: 收款用户姓名，check_name!=NO_CHECK时起作用,
-        amount: 付款金额，单位分，最小100,
-        desc: 描述
-    }
-    * Callback_success(json): 成功回调
-*/
-exports.pay_transfers = function(req, opt, Callback_success) {
-    var opt_source = opt; // 保留原始opt
-
-    var source_uri = req.originalUrl; // 地址栏
-
-    var domain_index = base.get_domain_index(req);
-
-    // 商户号
-    opt.mchid = opt.mchid || base.mch_id[domain_index];
-
-    domain_index = base.mch_id.indexOf(opt.mchid);
-
-    // 微信appid
-    opt["mch_appid"] = base.appID[domain_index];
-
-    // 校验选项
-    opt.check_name = opt.check_name || "NO_CHECK";
-
-    // 客户端IP
-    opt["spbill_create_ip"] = req.ip.replace("::ffff:", "");
-    if (opt["spbill_create_ip"] == "::1")
-        opt["spbill_create_ip"] = "127.0.0.1";
-
-    // 随机数
-    opt["nonce_str"] = func.CreateRandomStr(32, 7);
-
-    // 订单号
-    opt["partner_trade_no"] = base.get_mch_billno(opt.mchid);
-
-    // 签名
-    var signature = base.make_signature(opt, base.pay_api_key[domain_index]);
-
-    // 组织xml
-    opt["sign"] = signature;
-    var xml = func.jsonToXml(opt);
-
-    // console.log("\nhandle weixin:785:")
-    // console.log(xml);
-
-    // 发送请求
-    var _opt = {
-        url: "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers",
-        method: "post_str",
-        PostData: xml,
-        PostData_escape: "false",
-        pfx: base.pay_cert_path[domain_index],
-        passwd: base.pay_cert_passwd[domain_index]
-    };
-    var _Callback_success = function(xml) {
-        func.xmlToJson(xml, function(json) {
-
-            // console.log("\nhandle weixin 814:")
-            // console.dir(json.xml);
-
-            // 如果是订单号问题，则1分钟后重新发放（微信频率限制）
-            if (json.xml.err_code == "FATAL_ERROR")
-                setTimeout(function() {
-                    base.pay_transfers(req, opt_source, Callback_success);
-                }, 61000);
-            else {
-                // console.log("\nhandle weixin 823:")
-                // console.log("log start");
-
-                // 写入日志
-                var _log_str = json.xml.result_code == "SUCCESS" ? "成功" : "失败" + "\t(" + json.xml.return_msg + ")";
-                _log_str += "\r\n订单号：" + opt.partner_trade_no;
-                _log_str += "\r\n金额：" + opt.amount / 100.00 + "元";
-                _log_str += "\r\nOpenID：" + opt.openid;
-                _log_str += "\r\n公众号：" + func.arr_value_match(base.appID, opt.mch_appid, base.Platform_name) + "\t(" + opt.mch_appid + ")";
-                _log_str += "\r\n调用地址：" + source_uri;
-                _log_str += "\r\n日志时间：" + new Date().toLocaleString();
-
-                var _log_opt = {
-                    str: _log_str
-                };
-                base.pay_log_write(_log_opt);
-
-                // console.log("\nhandle weixin 839:")
-                // console.log("log end")
-
-                // 成功回调
-                if (Callback_success)
-                    Callback_success(json.xml);
-            }
-        });
-    };
-
-    var Callback_error = function(err) {
-        console.log("\nhandle weixin 982:")
-        console.dir(err);
-    };
-
-    func.Request(_opt, _Callback_success, Callback_error);
 };
 
 // 【同步】 生成支付订单号
@@ -1002,6 +945,7 @@ exports.pay_transfers = function(req, opt, Callback_success) {
     【返回】订单号：mch_id + yyyyMMdd + 10位随机数，不确保唯一性
     mch_id：商户号。默认根据二级域名获得
 */
+
 exports.get_mch_billno = function(mch_id) {
 
     var dt = new Date().toLocaleDateString().replace(/-/g, ""); //获得日期字符串
@@ -1036,7 +980,7 @@ exports.make_signature = function(opt, pay_api_key) {
 /*
     高京
     2016-05-06
-    * opt: {
+    * opt = {
         str: 日志内容
     }
 */
