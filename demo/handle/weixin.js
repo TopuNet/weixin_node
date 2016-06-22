@@ -1,32 +1,36 @@
-// 1.0.3
+/*
+    高京
+    20160415
+    微信插件
+*/
 
 var func = require("./functions.js");
 var base = require("./weixin.js");
 var fs = require("fs"); // 文件操作，valid_accessToken_jsapiTicket使用
 var crypto = require('crypto'); // 加解密需要
 
-exports.Platform_name = ["", "高京测试号", "拓扑高科"]; // 平台名字
-exports.domain = ["", "wx", "nodewx"]; // 二级域名
-exports.appID = ["", "wx7ecd1e0f2c477274", "wxc326ec77786d9134"]; // appid
-exports.appSecret = ["", "995785f1c2281400c9908e72b82535cc", "ca900cf6f49c4097dcbfa5d0bbc9aa68"]; // appsecret
-exports.appToken = ["", "ivfxqc1420421734", "dw5CiwQ0DrQGxJebmZ4osBIuEWLRAOKB"]; // Token
-exports.appEncodingAESKey = ["", "", "fhD9Hkdw5CiwQ0DrQGxJebmZ4osBIuEWLRAOKBI7Oof"]; // EncodingAESKey
+exports.Platform_name = ["", "高京测试号"]; // 平台名字
+exports.domain = ["", "www"]; // 二级域名
+exports.appID = ["", "wx7ecd1e0f2c477274"]; // appid
+exports.appSecret = ["", "995785f1c2281400c9908e72b82535cc"]; // appsecret
+exports.appToken = ["", "ivfxqc1420421734"]; // Token
+exports.appEncodingAESKey = ["", ""]; // EncodingAESKey
 
 exports.wx_access_token_dir_path = "./wx_Auth/"; // access_token值存放文本文件的目录，以/结束。
 
-exports.mch_id = ["", "", "1231380902"]; // 支付商户号
-exports.sub_mch_id = ["", "", ""]; // 支付子商户号
-exports.pay_api_key = ["", "", "5L1i2M7i4G5P8L8k9G5d2L5P3C5g9d8p"]; // API证书密钥，支付平台中设置
-exports.pay_cert_path = ["", "", "e:/apiclient_cert_topu_1231380902.p12"]; // 证书物理路径 (证书需要商户在pay.weixin.qq.com登录后下载，尽量不放在网站目录下）[e.x.1]"e:\abc.pfx" [e.x.2]Server.MapPath("/abc.pfx")
-exports.pay_cert_passwd = ["", "", "1231380902"]; // 证书密码
+exports.mch_id = ["", ""]; // 支付商户号
+exports.sub_mch_id = ["", ""]; // 支付子商户号
+exports.pay_api_key = ["", ""]; // API证书密钥，支付平台中设置
+exports.pay_cert_path = ["", ""]; // 证书物理路径 (证书需要商户在pay.weixin.qq.com登录后下载，尽量不放在网站目录下）[e.x.1]"e:\abc.p12" [e.x.2]"./abc.p12"
+exports.pay_cert_passwd = ["", ""]; // 证书密码
 exports.pay_log_dir = "./wx_pay_log/"; // 存放日志的目录，以/结束。
 
 
-exports.access_token = ["", "", ""]; // access_token
-exports.access_token_time = ["", new Date().setFullYear(1900, 0, 1), new Date().setFullYear(1900, 0, 1)]; // access token过期时间
-exports.jsapi_ticket = ["", "", ""]; // jsapi_ticket
-exports.jsapi_ticket_time = ["", new Date().setFullYear(1900, 0, 1), new Date().setFullYear(1900, 0, 1)]; // jsapi_ticket过期时间
-exports.update_access_token = [false, false, false]; // 正在更新access_token，防止多个客户端一起更新
+exports.access_token = ["", ""]; // access_token
+exports.access_token_time = ["", new Date().setFullYear(1900, 0, 1)]; // access token过期时间
+exports.jsapi_ticket = ["", ""]; // jsapi_ticket
+exports.jsapi_ticket_time = ["", new Date().setFullYear(1900, 0, 1)]; // jsapi_ticket过期时间
+exports.update_access_token = [false, false]; // 正在更新access_token，防止多个客户端一起更新
 
 exports.reply_MsgType = ["", "text", "image", "voice", "video", "news"]; // 回复类型
 exports.reply_MsgType_str = ["", "文字", "图片", "语音", "视频", "图文"]; // 回复类型
@@ -97,10 +101,16 @@ exports.get_accessToken_jsapiTicket = function(req, need_jsapi_ticket, Callback_
     var filePath = dirPath + base.domain[domain] + ".txt";
 
     var getting = function() {
+
         access_token = base.access_token[domain];
-        access_token_time = base.access_token_time[domain];
+        access_token_time = base.access_token_time[domain] || new Date().getTime();
         jsapi_ticket = base.jsapi_ticket[domain];
-        jsapi_ticket_time = base.jsapi_ticket_time[domain];
+        jsapi_ticket_time = base.jsapi_ticket_time[domain] || new Date().getTime();
+
+        if (access_token_time < 0)
+            access_token_time = new Date().getTime();
+        if (jsapi_ticket_time < 0)
+            jsapi_ticket_time = new Date().getTime();
     }
 
     var valid = function() {
@@ -117,12 +127,13 @@ exports.get_accessToken_jsapiTicket = function(req, need_jsapi_ticket, Callback_
         var update_file = function() {
             // console.log("\nhandle weixin 113:here")
             getting();
-            fs.writeFileSync(filePath, access_token + "||" + new Date(access_token_time).getTime() + "||" + jsapi_ticket + "||" + new Date(jsapi_ticket_time).getTime());
+
+            fs.writeFileSync(filePath, access_token + "||" + access_token_time + "||" + jsapi_ticket + "||" + jsapi_ticket_time);
         };
 
         // 验证jsapi_ticket有效，失效则更新
         var valid_jsapi_ticket = function(access_token) {
-            if (!jsapi_ticket && need_jsapi_ticket) {
+            if (need_jsapi_ticket) {
 
                 // 此处从数据库调取数据并赋值
                 (function() {})();
@@ -136,7 +147,7 @@ exports.get_accessToken_jsapiTicket = function(req, need_jsapi_ticket, Callback_
                     var CallBackSuccess = function(result) {
                         // 更新缓存
                         base.jsapi_ticket[domain] = result.ticket;
-                        base.jsapi_ticket_time[domain] = new Date(now + result.expires_in * 1000);
+                        base.jsapi_ticket_time[domain] = now + result.expires_in * 1000;
 
                         // 更新文件
                         update_file();
@@ -186,6 +197,8 @@ exports.get_accessToken_jsapiTicket = function(req, need_jsapi_ticket, Callback_
                     base.jsapi_ticket_time[domain] = jsapi_ticket_time = txt[3];
                 }
             }
+
+            getting();
         }
 
         // access_token不存在或过期（当前时间超过（有效时间-提前刷新间隔））
@@ -199,7 +212,7 @@ exports.get_accessToken_jsapiTicket = function(req, need_jsapi_ticket, Callback_
             };
             var CallBackSuccess = function(result) {
                 base.access_token[domain] = result.access_token;
-                base.access_token_time[domain] = new Date(now + result.expires_in * 1000);
+                base.access_token_time[domain] = now + result.expires_in * 1000;
 
                 // 更新jsapi_ticket
                 valid_jsapi_ticket(result.access_token);
@@ -214,7 +227,7 @@ exports.get_accessToken_jsapiTicket = function(req, need_jsapi_ticket, Callback_
             };
             func.Request(opt, CallBackSuccess, CallBackError);
         } else {
-            Callback_success(access_token, jsapi_ticket);
+            valid_jsapi_ticket(access_token);
         }
     };
 
@@ -721,7 +734,7 @@ exports.send_template_message = function(req, opt, Callback_success) {
 /*
     * 高京
     * 2016-06-10
-    * opt = {
+    * opt: {
         expire_seconds: 该二维码有效时间，以秒为单位。 最大不超过2592000（即30天），此字段如果不填，则默认有效期为30秒。,
         action_name: 二维码类型，QR_SCENE为临时,QR_LIMIT_SCENE为永久（sence_id参数传值）,QR_LIMIT_STR_SCENE为永久（scene_str参数传值）,
         scene_v: 场景值，QR_SCENE为32位非0整型，QR_LIMIT_SCENE最大值为100000（目前参数只支持1--100000），QR_LIMIT_STR_SCENE为字符串，长度限制为1到64,
@@ -778,29 +791,20 @@ exports.create_qrcode = function(req, opt, Callback_success) {
     base.get_accessToken_jsapiTicket(req, false, access_token_Callback_success);
 };
 
-// 【异步】 用二维码ticket换取二维码图片并保存为服务器图片。
+// 【异步】 用二维码ticket换取二维码。
 /*
     * 高京
     * 2016-06-10
-    * opt = {
-        ticket: ticket值,
-        filepath: 文件完整路径，需确保文件目录存在
+    * opt: {
+        ticket: ticket值
     }
-    * callback(): 成功回调
+    * callback(str): 成功回调
 */
 exports.get_qrcode_by_ticket = function(opt, Callback_success) {
 
     var _opt = {
         "url": "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + opt.ticket
     };
-
-    var _Callback_success = function(json) {
-
-
-        var request = require("request");
-
-        request("https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + json.ticket, Callback_success).pipe(fs.createWriteStream(opt.filepath));
-    }
 
     var Callback_error = function(err) {
         console.log("\nhandle weixin 801:")
@@ -815,7 +819,7 @@ exports.get_qrcode_by_ticket = function(opt, Callback_success) {
 /*
     * 高京
     * 2016-05-06
-    * opt = {
+    * opt: {
         mch_id: 微信商户号。默认根据二级域名获得,
         send_name: 红包发送者名称,
         re_openid: 接受红包的用户OpenID,
@@ -976,11 +980,11 @@ exports.make_signature = function(opt, pay_api_key) {
     return func.CreateHash(str, "md5");
 };
 
-// 【同步】写入支付日志
+// 【同步】 写入支付日志
 /*
     高京
     2016-05-06
-    * opt = {
+    * opt: {
         str: 日志内容
     }
 */
@@ -1016,3 +1020,58 @@ exports.pay_log_write = function(opt) {
 
     return true;
 };
+
+// 【异步】 更新jsapi的wx_config相关数据
+/*
+    高京
+    2016-06-18
+    * opt: {
+        jsApiList: 使用接口，字符串。默认："[\"onMenuShareTimeline\", \"onMenuShareAppMessage\", \"chooseImage\", \"uploadImage\", \"hideAllNonBaseMenuItem\"]"
+    }
+    * Callback_success({
+        appId: appId, 
+        timestamp: 时间戳 ,
+        nonceStr: 随机数, 
+        signature: 签名, 
+        jsApiList: 接口列表,
+    }): 成功回调
+*/
+exports.get_jsapi_config = function(req, opt, Callback_success) {
+
+    // 更新jsapi_ticket后的回调
+    var _Callback_success = function(access_token, jsapi_ticket) {
+
+        var domain_index = base.get_domain_index(req);
+
+        var wx_config = {
+            appId: base.appID[domain_index],
+            timestamp: new Date().getTime(),
+            nonceStr: func.CreateRandomStr(16, 7),
+            signature: "",
+            jsApiList: opt.jsApiList || "[\"onMenuShareTimeline\", \"onMenuShareAppMessage\", \"chooseImage\", \"uploadImage\", \"hideAllNonBaseMenuItem\"]"
+        };
+
+        var signature_opt = func.JsonSort({
+            noncestr: wx_config.nonceStr,
+            jsapi_ticket: jsapi_ticket,
+            timestamp: wx_config.timestamp,
+            url: "http://" + (req.headers['x-forwarded-host'] || req.hostname) + req.originalUrl
+        });
+
+        var str = "";
+        for (var key in signature_opt) {
+            if (str != "")
+                str += "&";
+            str += key + "=" + signature_opt[key];
+        }
+
+        wx_config.signature = func.CreateHash(str, "sha1", 1);
+
+        if (Callback_success) {
+            Callback_success(wx_config);
+        }
+    }
+
+    base.get_accessToken_jsapiTicket(req, true, _Callback_success);
+
+}

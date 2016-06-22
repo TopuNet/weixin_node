@@ -164,7 +164,12 @@ exports.domain = "twedding.cn"; // 主域名-获得二级域名用
                 method: get|post_json|post_file。 默认get,
                 PostData: method=post_json时有效; json对象,
                 PostData_escape: 对PostData进行unicode和escape编码（针对拓扑接口）。默认"true"，调用微信或其他不需要编码接口时，设为"false"
-                files: method=post_file时有效; 名称1|文件名1||名称2|文件名2||名称3|文件名3...
+                files: method=post_file时有效; 名称1|文件名1||名称2|文件名2||名称3|文件名3...,
+                cert: cert证书文件路径。"d:\cert.crt"||"./cert.crt",
+                cert_key: cert密钥文件路径。"d:\cert.key"||"./cert.key",
+                ca: ca证书路径,
+                pfx：pfx证书,
+                passwd: cert|pfx证书密码
           }
         * Callback_success(json): 成功回调
         * Callback_error(err): 失败回调
@@ -628,7 +633,7 @@ exports.DoREST = function(Host, Port, Path, Method, PostData, CallBackSuccess, C
         PostData = func.JsonEscape(PostData);
         PostData = JSON.stringify(PostData);
         _req.write(PostData, "uniencode"); //传递POST数据，如不经POST传递数据，可省略
-        console.dir(_req);
+        // console.dir(_req);
     }
     _req.end();
     _req.on('error', function(e) {
@@ -1293,10 +1298,11 @@ exports.formatTextArea = function(str) {
      */
 exports.get_domain = function(req) {
     var domain = "";
-    var hostname = req.hostname.toLowerCase();
+    var hostname = (req.header['x-forwarded-host'] || req.hostname).toLowerCase();
+
     var end = hostname.indexOf("." + func.domain);
     if (end == -1) // 无二级域名
-        domain = "wx";
+        domain = "www";
     else
         domain = hostname.substring(0, end);
     return domain;

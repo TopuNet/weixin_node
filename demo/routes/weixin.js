@@ -33,6 +33,94 @@ router.post("/get_mp_event", weixin.DecryptMsg, function(req, res, next) {
         console.log("\nroutes weixin 50：签名错误，非法POST来源");
     } else {
 
+        // 来宾扫描新人微信墙二维码，处理方法：更新访问者对应新人，并发送微信墙链接图文
+        var Visitor_Scaning = function(Cid, json) {
+            var ParamsJsonObj = {
+                "Cid": Cid,
+                "OpenID": json.FromUserName
+            };
+            var Callback_success = function(valid_str) {
+                var PostData = {
+                    "params": ParamsJsonObj,
+                    "sign_valid": JSON.parse(valid_str)
+                };
+
+                var opt = {
+                    url: config.host + "/handler/wechatWall2016_Visitors.ashx?act=add",
+                    method: "post_json",
+                    PostData: PostData
+                };
+                var _Callback_success = function() {
+
+                    var opt = {
+                        Title: "欢迎参加我们的婚礼，点我发祝福~",
+                        Description: "",
+                        Picurl: config.ImageDomain + "/upload_file/wechatWall/" + Cid + "/cover.jpg",
+                        Url: config.ImageDomain + "/wechatWall/Visitor"
+                    };
+                    var str = weixin.appendReply_Article(opt);
+
+                    opt = {
+                        "xml_json": json,
+                        "Reply": str,
+                        "Kind": 5,
+                        "Article_count": 1
+                    }
+                    var reply_msg = weixin.reply_msg(req, opt);
+
+                    res.send(reply_msg);
+                };
+                var _Callback_err = function(err) {
+                    console.log("\nroutes weixin 134:");
+                    console.dir(err);
+                }
+                func.Request(opt, _Callback_success, _Callback_err);
+            };
+            func.CreateTopuSignature(ParamsJsonObj, Callback_success);
+        };
+
+        // 粉丝直接关注公众号：发送分年份作品集链接
+        var Fans_Following = function() {
+            // 拼接作品图列表
+            var append_article_list = function(year) {
+                var url = "";
+                switch (year) {
+                    default:
+                        case 2015:
+                        url = "https://mp.weixin.qq.com/s?__biz=MzA4MjkxMTMwOA==&mid=401060421&idx=1&sn=9fa7fc0890bba98613a023068b092b77&scene=1&srcid=0611IY0fazLCr6KvX4VkXFU9&pass_ticket=WWbILknTHnHL5KxZuD1AV35z1S9Tscx%2BGW9H8DcKVxU%3D#rd"
+                    break;
+                    case 2014:
+                            url = "https://mp.weixin.qq.com/s?__biz=MzA4MjkxMTMwOA==&mid=202926710&idx=1&sn=89e6dbb208469b298cc1543eefa179d2&scene=1&srcid=0611krAQJBRPLwXANahYxH7N&pass_ticket=WWbILknTHnHL5KxZuD1AV35z1S9Tscx%2BGW9H8DcKVxU%3D#rd"
+                        break;
+                }
+                var opt = {
+                    Title: year + "作品集",
+                    Picurl: config.ImageDomain + "/images/mp_article_list_" + year + ".jpg",
+                    Url: url
+                };
+                // console.log("\nroutes weixin 182:");
+                // console.dir(opt);
+                return weixin.appendReply_Article(opt);
+            };
+
+            var str = "";
+            var s = 2014,
+                e = 2016;
+            for (; e >= s; e--) {
+                str += append_article_list(e);
+            }
+
+            var opt = {
+                "xml_json": json,
+                "Reply": str,
+                "Kind": 5,
+                "Article_count": 3
+            }
+            var reply_msg = weixin.reply_msg(req, opt);
+
+            res.send(reply_msg);
+        };
+
         var json = req.body;
         if (json.MsgType == "text") {
             switch (json.Content) {
@@ -103,23 +191,21 @@ router.post("/get_mp_event", weixin.DecryptMsg, function(req, res, next) {
         } else if (json.MsgType == "event") {
             switch (json.Event) {
                 case "subscribe":
-                    var opt = {
-                        xml_json: json,
-                        Reply: "关注成功",
-                        Kind: 1
-                    };
-                    var reply_msg = weixin.reply_msg(req, opt);
-                    res.send(reply_msg);
+                    var Cid = json.EventKey.substring(8);
+
+                    if (Cid == "") { // 直接关注微信号
+                        Fans_Following();
+                    } else { // 扫微信墙二维码关注微信号
+                        Visitor_Scaning(Cid, json);
+                    }
 
                     break;
                 case "SCAN":
-                    var opt = {
-                        xml_json: json,
-                        Reply: "扫码成功",
-                        Kind: 1
-                    };
-                    var reply_msg = weixin.reply_msg(req, opt);
-                    res.send(reply_msg);
+                    var Cid = func.filterNoNum(json.EventKey);
+                    if (Cid == "")
+                        Fans_Following();
+                    else
+                        Visitor_Scaning(Cid, json);
                     break;
                 case "unsubscribe":
                     break;
@@ -268,6 +354,7 @@ router.get("/create_qrcode", function(req, res, next) {
     };
     var Callback_success = function(json) {
 
+        var request = require("request");
         var fs = require("fs");
 
         var dir = "./upload_file";
@@ -285,19 +372,24 @@ router.get("/create_qrcode", function(req, res, next) {
 
         var filename = dir + "/qrcode.jpg";
 
-        var _opt = {
-            ticket: json.ticket,
-            filepath: filename
-        };
-
-        var _Callback_success = function() {
+        request("https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + json.ticket, function() {
             res.redirect(filename.substring(1));
-        };
-
-        weixin.get_qrcode_by_ticket(_opt, _Callback_success);
+        }).pipe(fs.createWriteStream(filename));
     }
 
     weixin.create_qrcode(req, opt, Callback_success);
+});
+
+// 组织jsapi_wx_config
+router.get("/jsapi_wx_config", function(req, res, next) {
+    var opt = {
+        jsApiList: "[\"scanQRCode\"]"
+    };
+
+    var Callback_success=function(wx_config){
+        res.send(wx_config);
+    };
+    weixin.get_jsapi_config(req, opt, Callback_success);
 });
 
 module.exports = router;

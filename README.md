@@ -1,4 +1,4 @@
-# weixin_node Node.Js v1.0.3
+# weixin_node Node.Js v1.0.4
 ###Node.Js端微信插件
 
 文件结构：
@@ -26,7 +26,7 @@
 		exports.mch_id = ["", ""]; // 支付商户号
 		exports.sub_mch_id = ["", ""]; // 支付子商户号
 		exports.pay_api_key = ["", ""]; // API证书密钥，支付平台中设置
-		exports.pay_cert_path = ["", ""]; // 证书物理路径 (证书需要商户在pay.weixin.qq.com登录后下载，尽量不放在网站目录下）[e.x.1]"e:\abc.pfx" [e.x.2]Server.MapPath("/abc.pfx")
+		exports.pay_cert_path = ["", ""]; // 证书物理路径 (证书需要商户在pay.weixin.qq.com登录后下载，尽量不放在网站目录下）[e.x.1]"e:\abc.p12" [e.x.2]"./abc.p12"
 		exports.pay_cert_passwd = ["", ""]; // 证书密码
 		exports.pay_log_dir = "./wx_pay_log/"; // 存放日志的目录，以/结束。
 
@@ -38,6 +38,12 @@
 
 更新历史：
 --------------
+
+
+v1.0.4：
+
+		1. 增加更新jsapi的web_config相关参数接口，具体使用方法参见PDF文档
+		2. 修改更新access_token、jsapi_ticket方法的bug
 
 
 v1.0.3：
