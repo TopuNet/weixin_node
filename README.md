@@ -1,9 +1,9 @@
-# weixin_node Node.Js v1.0.4
-###Node.Js端微信插件
+# weixin_node Node.Js v1.0.5
+###Node.Js端微信类库		
 
 文件结构：
 -------------
-1. 将functions.js和weixin.js放入项目同一文件夹中
+1. 下载最新版本的functions.js([https://www.github.com/TopuNet/node_functions](https://www.github.com/TopuNet/node_functions))和/dist/weixin.js放入项目同一文件夹中，比如/handle/
 
 页面引用：
 -------------
@@ -39,6 +39,12 @@
 更新历史：
 --------------
 
+v1.0.5：
+
+		1. 修改微信推送的xml消息解密中间件，将xml字符串(plain_text)和解析的json字符串(json_xml)同时next()
+		2. 在dist中删除functions
+		3. 修改demo
+		4. 修改readme
 
 v1.0.4：
 

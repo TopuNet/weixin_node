@@ -1,6 +1,6 @@
 /*
     高京
-    20160415
+    2016-08-05
     微信测试路由
 */
 
@@ -28,9 +28,9 @@ router.get("/get_mp_event", function(req, res, next) {
 });
 
 // 接收并处理微信服务器消息
-router.post("/get_mp_event", weixin.DecryptMsg, function(req, res, next) {
+router.post("/get_mp_event", weixin.DecryptMsg, function(weixin_msg, req, res, next) {
     if (!weixin.Valid_Server(req)) {
-        console.log("\nroutes weixin 50：签名错误，非法POST来源");
+        console.log("\nroutes weixin 33：签名错误，非法POST来源");
     } else {
 
         // 来宾扫描新人微信墙二维码，处理方法：更新访问者对应新人，并发送微信墙链接图文
@@ -40,6 +40,7 @@ router.post("/get_mp_event", weixin.DecryptMsg, function(req, res, next) {
                 "OpenID": json.FromUserName
             };
             var Callback_success = function(valid_str) {
+
                 var PostData = {
                     "params": ParamsJsonObj,
                     "sign_valid": JSON.parse(valid_str)
@@ -54,7 +55,7 @@ router.post("/get_mp_event", weixin.DecryptMsg, function(req, res, next) {
 
                     var opt = {
                         Title: "欢迎参加我们的婚礼，点我发祝福~",
-                        Description: "",
+                        Description: "a\nb\nc\nd",
                         Picurl: config.ImageDomain + "/upload_file/wechatWall/" + Cid + "/cover.jpg",
                         Url: config.ImageDomain + "/wechatWall/Visitor"
                     };
@@ -71,7 +72,7 @@ router.post("/get_mp_event", weixin.DecryptMsg, function(req, res, next) {
                     res.send(reply_msg);
                 };
                 var _Callback_err = function(err) {
-                    console.log("\nroutes weixin 134:");
+                    console.log("\nroutes weixin 79:");
                     console.dir(err);
                 }
                 func.Request(opt, _Callback_success, _Callback_err);
@@ -121,7 +122,7 @@ router.post("/get_mp_event", weixin.DecryptMsg, function(req, res, next) {
             res.send(reply_msg);
         };
 
-        var json = req.body;
+        var json = weixin_msg.json_xml;
         if (json.MsgType == "text") {
             switch (json.Content) {
                 case "1": // 回复文字消息
@@ -150,7 +151,7 @@ router.post("/get_mp_event", weixin.DecryptMsg, function(req, res, next) {
                         type: type,
                         Callback_success: function(_json) {
                             var _opt = {
-                                xml_json: req.body,
+                                xml_json: json,
                                 Reply: _json.media_id,
                                 Kind: parseInt(json.Content)
                             };
@@ -386,7 +387,7 @@ router.get("/jsapi_wx_config", function(req, res, next) {
         jsApiList: "[\"scanQRCode\"]"
     };
 
-    var Callback_success=function(wx_config){
+    var Callback_success = function(wx_config) {
         res.send(wx_config);
     };
     weixin.get_jsapi_config(req, opt, Callback_success);

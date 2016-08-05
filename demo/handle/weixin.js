@@ -1,7 +1,8 @@
 /*
     高京
-    20160415
+    2016-08-05
     微信插件
+    v1.0.5
 */
 
 var func = require("./functions.js");
@@ -299,16 +300,19 @@ exports.DecryptMsg = function(req, res, next) {
 
         // 将xml转为json
         var Callback_success = function(json) {
-            req.body = json.xml;
+            next({
+                json_xml: json.xml,
+                plain_text: plain_text
+            });
         };
 
         func.xmlToJson(plain_text, Callback_success);
 
-        next();
-
     } else { // 未加密消息，返回原始消息
-        req.body = req.body.xml;
-        next();
+        next({
+            json_xml: req.body.xml,
+            plain_text: req.body.xml
+        });
     }
 };
 
