@@ -1,5 +1,6 @@
 # weixin_node Node.Js v1.0.5
-###Node.Js端微信类库		
+###Node.Js端微信类库	
+###安装：npm install TopuNet-weixin-node
 
 文件结构：
 -------------
@@ -45,6 +46,7 @@ v1.0.5：
 		2. 在dist中删除functions
 		3. 修改demo
 		4. 修改readme
+		5. 发布到npm：TopuNet-weixin-node
 
 v1.0.4：
 
