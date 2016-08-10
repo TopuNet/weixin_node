@@ -393,4 +393,33 @@ router.get("/jsapi_wx_config", function(req, res, next) {
     weixin.get_jsapi_config(req, opt, Callback_success);
 });
 
+// 新增临时素材
+router.get("/upload_file_temp", function(req, res, next) {
+    var opt = {
+        filename: "./0.jpg",
+        type: "image",
+        Callback_success: function(media_id) {
+            res.send(media_id);
+        }
+    };
+
+    weixin.upload_file_temp(req, opt);
+});
+
+// 下载临时素材
+router.get("/download_file_temp", function(req, res, next) {
+    var opt = {
+        media_id: req.query["media_id"],
+        save_dir: "/abc",
+        ext: "png",
+        Callback_success: function(file) {
+            console.log("\nroutes weixin 414:");
+            console.dir(file);
+            res.send(JSON.stringify(file));
+        }
+    };
+
+    weixin.download_file_temp(req, opt);
+});
+
 module.exports = router;

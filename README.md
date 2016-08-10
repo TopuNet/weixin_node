@@ -1,4 +1,4 @@
-# weixin_node Node.Js v1.0.5
+# weixin_node Node.Js v1.0.6
 ###Node.Js端微信类库	
 ###安装：npm install TopuNet-weixin-node
 
@@ -39,6 +39,12 @@
 
 更新历史：
 --------------
+
+v1.0.6：
+		
+		1. 增加下载临时素材方法
+		2. 将增加临时素材方法写入文档
+		3. 修改demo
 
 v1.0.5：
 

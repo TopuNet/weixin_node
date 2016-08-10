@@ -1,13 +1,13 @@
 /*
     高京
-    2016-08-05
+    2016-08-10
     微信插件
-    v1.0.5
+    v1.0.6
 */
 
 var func = require("./functions.js");
 var base = require("./weixin.js");
-var fs = require("fs"); // 文件操作，valid_accessToken_jsapiTicket使用
+var fs = require("fs"); // 文件操作，valid_accessToken_jsapiTicket / download_file_temp 使用
 var crypto = require('crypto'); // 加解密需要
 
 exports.Platform_name = ["", "高京测试号"]; // 平台名字
@@ -412,18 +412,11 @@ exports.reply_msg = function(req, opt) {
         str += "<ArticleCount>" + opt.Article_count + "</ArticleCount>" + "<" + base.media_type_tag[opt.Kind] + ">" + opt.Reply + "</" + base.media_type_tag[opt.Kind] + ">";
     str += "</xml>";
 
-    // var domain_index = base.get_domain_index(req);
-    // if (base.appEncodingAESKey[domain_index])
-    //     str = base.EncryptMsg(domain_index, str);
-
-    // console.log("\nhandle weixin 390:")
-    // console.log(str);
-
     return str;
 
 };
 
-// 【异步】上传媒体到微信
+// 【异步】新增临时素材
 /*
     高京
     2016-04-27
@@ -452,21 +445,61 @@ exports.upload_file_temp = function(req, opt) {
         }
 
         func.Request(option, opt.Callback_success, Callback_error);
-
-
-        // var _req = request.post(url, function(err, res, result) {
-        //     if (err) {
-        //         console.log("\nhandle weixin 291:")
-        //         console.dir(err);
-        //     } else if (opt.Callback_success) {
-        //         var json = JSON.parse(result);
-        //         opt.Callback_success(json.media_id);
-        //     }
-        // });
-        // var form = _req.form();
-        // form.append("media", fs.createReadStream(opt.filename));
-        // form.append("end", "");
     });
+};
+
+// 【异步】下载临时素材
+/*
+    高京
+    2016-08-10
+    opt = {
+        media_id: 临时素材的media_id,
+        save_dir: 保存文件夹（如文件夹不存在则自动创建，但不支持多级文件夹均不存在的情况），不包含文件名。默认 "/"。
+        ext: 文件后缀，不含"."，默认jpg
+        Callback_success(file): 成功回调
+        * file = {
+            dir: "/UploadFile/", // 最终保存的文件夹，"/" 开头
+            filename: "201608101530503724.jpg", // 文件名，不含路径，格式：yyyyMMddHHmmssRRRR.ext
+        }
+    }
+*/
+exports.download_file_temp = function(req, opt) {
+    opt.save_dir = opt.save_dir || "/";
+    opt.ext = opt.ext || "jpg";
+    var access_token_Callback_success = function(access_token) {
+
+        // 文件名
+        var dt = new Date();
+        var rnd = parseInt(Math.random() * 8999 + 1000).toString();
+        var filename = func.dateFormat(dt, "yyyyMMddHHmmss") + rnd + "." + opt.ext;
+
+        // 文件夹
+        opt.save_dir = opt.save_dir.replace(/\\/g, "/");
+        if (opt.save_dir.substr(opt.save_dir.length - 1, 1) != "/")
+            opt.save_dir += "/";
+        if (!fs.existsSync("." + opt.save_dir))
+            fs.mkdirSync("." + opt.save_dir);
+
+        // 文件完整路径
+        var filepath = opt.save_dir + filename;
+        var request = require("request");
+        request.get("https://api.weixin.qq.com/cgi-bin/media/get?access_token=" + access_token + "&media_id=" + opt.media_id)
+            .on("end", function() {
+                if (opt.Callback_success) {
+                    opt.Callback_success({
+                        dir: opt.save_dir,
+                        filename: filename,
+                    });
+                }
+            })
+            .on("error", function(err) {
+                console.log("\handle weixin 517:");
+                console.dir(err);
+            })
+            .pipe(fs.createWriteStream("." + filepath));
+    };
+
+    base.get_accessToken_jsapiTicket(req, false, access_token_Callback_success);
 };
 
 // 【同步】拼接被动回复(多)图文消息
