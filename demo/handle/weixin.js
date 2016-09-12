@@ -2,7 +2,7 @@
     高京
     2016-08-10
     微信插件
-    v1.0.6
+    v1.0.7
 */
 
 var func = require("./functions.js");
@@ -112,7 +112,7 @@ exports.get_accessToken_jsapiTicket = function(req, need_jsapi_ticket, Callback_
             access_token_time = new Date().getTime();
         if (jsapi_ticket_time < 0)
             jsapi_ticket_time = new Date().getTime();
-    }
+    };
 
     var valid = function() {
 
@@ -222,7 +222,7 @@ exports.get_accessToken_jsapiTicket = function(req, need_jsapi_ticket, Callback_
                 update_file();
             };
             var CallBackError = function(err) {
-                console.log("\nhandle weixin 206:")
+                console.log("\nhandle weixin 206:");
                 console.dir(err);
                 base.update_access_token[domain] = false;
             };
@@ -326,7 +326,6 @@ exports.EncryptMsg = function(domain_index, Msg) {
 
     var appID = base.appID[domain_index];
     var appEncodingAESKey = base.appEncodingAESKey[domain_index];
-    var appToken = base.appToken[domain_index];
 
     // 16位随机字符串添加到明文开头
     // 使用自定义的填充方式对明文进行补位填充
@@ -352,7 +351,7 @@ exports.EncryptMsg = function(domain_index, Msg) {
                 s.push(pad);
             return s.join('');
         },
-    }
+    };
 
     var text = new Buffer(Msg),
         pad = enclen(text.length),
@@ -388,9 +387,9 @@ exports.EncryptMsg = function(domain_index, Msg) {
 */
 exports.reply_msg = function(req, opt) {
 
-    opt.video_title == opt.video_title || "";
-    opt.video_description == opt.video_description || "";
-    opt.Article_count == opt.Article_count || 0;
+    opt.video_title = opt.video_title ? opt.video_title : "";
+    opt.video_description = opt.video_description ? opt.video_description : "";
+    opt.Article_count = opt.Article_count ? opt.Article_count : 0;
 
     var str = "<xml>";
     str += "<ToUserName><![CDATA[" + opt.xml_json.FromUserName + "]]></ToUserName>";
@@ -440,9 +439,9 @@ exports.upload_file_temp = function(req, opt) {
         };
 
         var Callback_error = function(err) {
-            console.log("\nhandle weixin 428:")
+            console.log("\nhandle weixin 428:");
             console.dir(err);
-        }
+        };
 
         func.Request(option, opt.Callback_success, Callback_error);
     });
@@ -558,7 +557,7 @@ exports.getOpenID = function(req, Callback_success, OpenID_start) {
             url: "https://api.weixin.qq.com/cgi-bin/user/get?access_token=" + access_token + "&next_openid=" + OpenID_start
         };
         func.Request(opt, Callback_success);
-    }
+    };
 
     base.get_accessToken_jsapiTicket(req, false, access_token_Callback_success);
 };
@@ -596,7 +595,7 @@ exports.getUserInfo = function(req, OpenID, Callback_success) {
         };
 
         func.Request(opt, Callback_success);
-    }
+    };
 
     base.get_accessToken_jsapiTicket(req, false, access_token_Callback_success);
 };
@@ -757,7 +756,7 @@ exports.send_template_message = function(req, opt, Callback_success) {
         };
 
         var Callback_error = function(err) {
-            console.log("\nhandle weixin 698:")
+            console.log("\nhandle weixin 698:");
             console.dir(err);
         };
 
@@ -795,13 +794,13 @@ exports.create_qrcode = function(req, opt, Callback_success) {
                 "scene": {
                     "scene_str": opt.scene_v
                 }
-            }
+            };
         } else {
             action_info = {
                 "scene": {
                     "scene_id": opt.scene_v
                 }
-            }
+            };
         }
 
         var _opt = {
@@ -816,7 +815,7 @@ exports.create_qrcode = function(req, opt, Callback_success) {
         };
 
         var Callback_error = function(err) {
-            console.log("\nhandle weixin 775:")
+            console.log("\nhandle weixin 775:");
             console.dir(err);
         };
 
@@ -844,7 +843,7 @@ exports.get_qrcode_by_ticket = function(opt, Callback_success) {
     };
 
     var Callback_error = function(err) {
-        console.log("\nhandle weixin 801:")
+        console.log("\nhandle weixin 801:");
         console.dir(err);
     };
 
@@ -871,8 +870,6 @@ exports.get_qrcode_by_ticket = function(opt, Callback_success) {
 exports.send_cash_red = function(req, opt, Callback_success, Callback_error) {
     var opt_source = opt; // 保留原始opt
 
-    var source_uri = req.originalUrl; // 地址栏
-
     var domain_index = base.get_domain_index(req);
     opt.mch_id = opt.mch_id || base.mch_id[domain_index];
 
@@ -896,7 +893,7 @@ exports.send_cash_red = function(req, opt, Callback_success, Callback_error) {
     opt["sign"] = signature;
     var xml = func.jsonToXml(opt);
 
-    console.log("\nhandle weixin:785:")
+    console.log("\nhandle weixin:785:");
     console.log(xml);
 
     // 发送请求
@@ -959,25 +956,25 @@ exports.send_cash_red = function(req, opt, Callback_success, Callback_error) {
     }
     * Callback_success(xml): 成功回调
 */
-exports.search_cash_red = function(req, opt, Callback_success, Callback_error) {
+// exports.search_cash_red = function(req, opt, Callback_success, Callback_error) {
 
-    // 获得二级域名序号
-    var domain_index = base.get_domain_index(req);
+//     // 获得二级域名序号
+//     var domain_index = base.get_domain_index(req);
 
-    // 商户号
-    opt["mch_id"] = opt["mch_id"] || base.mch_id[domain_index];
+//     // 商户号
+//     opt["mch_id"] = opt["mch_id"] || base.mch_id[domain_index];
 
-    // appID
-    opt["appid"] = func.arr_value_match(base.mch_id, opt["mch_id"], base.appID);
+//     // appID
+//     opt["appid"] = func.arr_value_match(base.mch_id, opt["mch_id"], base.appID);
 
-    // 随机数
-    opt["nonce_str"] = func.CreateRandomStr(32, 7);
+//     // 随机数
+//     opt["nonce_str"] = func.CreateRandomStr(32, 7);
 
-    // 订单类型-固定值
-    opt["bill_type"] = "MCHT";
+//     // 订单类型-固定值
+//     opt["bill_type"] = "MCHT";
 
 
-};
+// };
 
 // 【同步】 生成支付订单号
 /*
@@ -1006,9 +1003,9 @@ exports.make_signature = function(opt, pay_api_key) {
     opt = func.JsonSort(opt);
     var str = "";
     for (var key in opt) {
-        if (!opt[key] || opt[key] == "")
+        if (!opt[key] || opt[key] === "")
             continue;
-        if (str != "")
+        if (str !== "")
             str += "&";
         str += key + "=" + opt[key];
     }
@@ -1039,8 +1036,9 @@ exports.pay_log_write = function(opt) {
     // 获得日志文件
     var log_path = base.pay_log_dir + date + "_" + file_index.toString() + ".txt";
     var lock_path = log_path.replace(".txt", ".lock");
+    var fd_lock;
     if (fs.existsSync(log_path))
-        var fd_lock = fs.openSync(lock_path, "w");
+        fd_lock = fs.openSync(lock_path, "w");
     else {
         fs.openSync(log_path, "w");
     }
@@ -1097,7 +1095,7 @@ exports.get_jsapi_config = function(req, opt, Callback_success) {
 
         var str = "";
         for (var key in signature_opt) {
-            if (str != "")
+            if (str !== "")
                 str += "&";
             str += key + "=" + signature_opt[key];
         }
@@ -1107,8 +1105,8 @@ exports.get_jsapi_config = function(req, opt, Callback_success) {
         if (Callback_success) {
             Callback_success(wx_config);
         }
-    }
+    };
 
     base.get_accessToken_jsapiTicket(req, true, _Callback_success);
 
-}
+};

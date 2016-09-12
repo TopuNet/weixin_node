@@ -1,6 +1,7 @@
 /*
  *@ 高京
- *@ 20150825 
+ *@ 2016-08-10
+ *@ v1.0.2
  *@ 全局公共方法，添加方法的话：1.请先确认没有功能类同的方法可以使用（避免同一功能多个类同方法存在）；2.要尽量考虑可移植性和复用性，不要为了实现某一单一功能而增加本文件代码量；
                                 3.将调用方法写在顶部注释中；4.有新方法添加时，在群里吼一声
  */
@@ -646,19 +647,22 @@ exports.DoREST = function(Host, Port, Path, Method, PostData, CallBackSuccess, C
 
 /*
  *@ 高京
- *@ 2016-04-30
+ *@ 2016-08-10
  *@【异步】request请求
  *@ opt: {
         url: request地址，支持https协议和地址栏参数,
         method: get|post_json|post_file|post_str。 默认get,
         PostData: method=post_json||post_str时有效; post_json时为json对象，post_str时为任意字符串,
-        PostData_escape: 对PostData进行Json unicode和escape编码（针对拓扑接口），method=post_json时有效。默认"true"，调用微信或其他不需要编码接口时，设为"false",
         files: method=post_file时有效; 名称1|文件名1||名称2|文件名2||名称3|文件名3...,
         cert: cert证书文件路径。"d:\cert.crt"||"./cert.crt",
         cert_key: cert密钥文件路径。"d:\cert.key"||"./cert.key",
         ca: ca证书路径,
         pfx：pfx证书,
-        passwd: cert|pfx证书密码
+        passwd: cert|pfx证书密码,
+        headers:{ // 头信息
+            "Content-Type": 'application/json',
+            "Content-Length": ""
+        }
  *  }
  *@ Callback_success(json||str): 成功回调
  *@ Callback_error(err): 失败回调
@@ -668,21 +672,8 @@ exports.Request = function(opt, Callback_success, Callback_error) {
     // 默认提交方法
     opt.method = opt.method || "get";
 
-    // 提交内容
-    var PostData = "";
-    var body = "";
-    if (opt.method == "post_json" && opt.PostData)
-        PostData = JSON.stringify(opt.PostData);
-    else if (opt.method == "post_str" && opt.PostData)
-        body = opt.PostData;
-
-    // 默认是否对json数据进行编码
-    opt.PostData_escape = opt.PostData_escape || "true";
-
-    // 对json数据进行编码
-    if (opt.PostData_escape == "true" && PostData)
-        PostData = func.JsonEscape(PostData);
-
+    // 是否使用json格式
+    var use_json = opt.method == "post_json" ? true : false;
     // 证书
     var cert,
         key,
@@ -699,19 +690,21 @@ exports.Request = function(opt, Callback_success, Callback_error) {
         if (fs.existsSync(opt.pfx))
             pfx = func.ReadFileSync(opt.pfx);
     }
+    opt.headers == opt.headers || {};
 
     var options = {
         opt: {
             url: opt.url,
             method: opt.method == "get" ? "GET" : "POST",
-            form: PostData || null,
-            body: body || null,
+            body: opt.PostData || null,
+            json: use_json,
             agentOptions: {
                 cert: cert || null,
                 key: key || null,
                 pfx: pfx || null,
                 passphrase: cert || pfx ? opt.passwd : null
-            }
+            },
+            headers: opt.headers
         },
         Callback_success: function(err, _res, body) {
             if (err) {
@@ -726,9 +719,6 @@ exports.Request = function(opt, Callback_success, Callback_error) {
             }
         }
     };
-
-    // console.log("\nfunc 705:")
-    // console.dir(options.opt.body);
 
     var _req = request(options.opt, options.Callback_success);
 
